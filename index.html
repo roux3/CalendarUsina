@@ -171,7 +171,7 @@
     <script type="module">
         // Import Firebase (Modular Web SDK)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ==========================================
         // CONFIGURAÇÃO DO FIREBASE (INSIRA AQUI)
@@ -288,9 +288,33 @@
             }
         });
 
+        // ==========================================
+        // USER REGISTRY
+        // ==========================================
+        async function registerUser(name, phone) {
+            if (!db) return;
+            try {
+                // Use phone as document ID for easy lookup/deduplication
+                await setDoc(doc(db, "usuarios", phone), {
+                    nome: name,
+                    telefone: phone,
+                    last_login: serverTimestamp()
+                }, { merge: true });
+                console.log("Usuario registrado/atualizado:", name, phone);
+            } catch (e) {
+                console.error("Erro ao registrar usuario:", e);
+            }
+        }
+
         function initAuthenticatedApp() {
             showCalendar();
             setupRealtimeListeners();
+
+            // Register/Update User in Firestore
+            if (currentUser && currentPhone) {
+                registerUser(currentUser, currentPhone);
+            }
+
             // Try to auto-scroll after a short delay to ensure render
             setTimeout(scrollToCurrentMonth, 500);
         }
@@ -311,13 +335,21 @@
             document.getElementById('login-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = document.getElementById('username-input').value.trim();
-                const phone = phoneInput.value.trim();
+                const rawPhone = phoneInput.value.trim();
 
-                if (name && phone.length >= 14) {
+                // Clean input: remove all non-digits
+                let cleanPhone = rawPhone.replace(/\D/g, '');
+
+                if (name && cleanPhone.length >= 10) {
+                    // If 11 digits (DDD + 9 + 8 digits), remove the leading 9 (index 2)
+                    if (cleanPhone.length === 11) {
+                        cleanPhone = cleanPhone.substring(0, 2) + cleanPhone.substring(3);
+                    }
+
                     currentUser = name;
-                    currentPhone = phone;
+                    currentPhone = cleanPhone;
                     localStorage.setItem("sankyu_user_name", name);
-                    localStorage.setItem("sankyu_user_phone", phone);
+                    localStorage.setItem("sankyu_user_phone", cleanPhone);
                     document.getElementById('view-login').classList.add('hidden');
                     initAuthenticatedApp();
                 } else {
@@ -680,6 +712,7 @@
                 nomeUsuario: currentUser,
                 telefone: currentPhone,
                 notificado: false,
+                notificar_todos: true,
                 observacao: obs,
                 timestamp: serverTimestamp()
             };
