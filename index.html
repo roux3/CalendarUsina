@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sankyu Holiday Planner</title>
+    <title>Usina Calendário</title>
 
     <!-- PWA Meta Tags -->
     <link rel="manifest" href="./manifest.json">
@@ -414,8 +414,10 @@
                 cell.className = "aspect-square flex flex-col items-center justify-center rounded-lg text-sm transition cursor-pointer relative select-none hover:ring-2 hover:ring-offset-1 hover:ring-brand-200";
 
                 // --- STYLES ---
-                // 1. Holiday/Type
-                if (holiday) {
+                // 1. Background/Type
+                if (reservation && reservation.collection === 'folgas_programadas') {
+                    cell.classList.add("bg-blue-100", "text-green-700", "font-bold");
+                } else if (holiday) {
                     if (holiday.tipo === "Compensado") cell.classList.add("bg-orange-100", "text-orange-700", "font-bold");
                     else cell.classList.add("bg-red-100", "text-red-700", "font-bold");
                 } else if (dayOfWeek === 0 || dayOfWeek === 6) {
@@ -424,10 +426,9 @@
                     cell.classList.add("bg-white", "text-slate-700", "border", "border-slate-100");
                 }
 
-                // 2. Reservation Highlight
+                // 2. Reservation Highlight (Border)
                 if (reservation) {
                     cell.classList.add("border-2", "border-indigo-600");
-                    // Override border color/style if needed, but classList.add adds on top
                 }
 
                 // 3. Today Highlight
