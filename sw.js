@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sankyu-calendar-v1';
+const CACHE_NAME = 'usina-calendar-v1';
 const ASSETS_TO_CACHE = [
   './index.html',
   './manifest.json',
@@ -43,7 +43,7 @@ self.addEventListener('fetch', (event) => {
       // Return cached response if found, else fetch from network
       return response || fetch(event.request);
     }).catch(() => {
-        // Fallback or error handling if needed
+      // Fallback or error handling if needed
     })
   );
 });
