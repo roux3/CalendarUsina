@@ -1,6 +1,6 @@
 {
-  "name": "Calendário Sankyu",
-  "short_name": "Sankyu App",
+  "name": "Calendário Usina",
+  "short_name": "Usina App",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#eff6ff",
